@@ -70,9 +70,9 @@ void BoardInitMcu( void )
 	
 	LedInit(  );
  
- 	SensorsInit(  );
-	
-	BatteryInit(  );
+// 	SensorsInit(  );
+//	
+//	BatteryInit(  );
 
 	printf("BoardInitMcu\r\n");       
 }

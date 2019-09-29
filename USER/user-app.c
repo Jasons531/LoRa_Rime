@@ -26,7 +26,7 @@
  */
 #define OVER_THE_AIR_ACTIVATION_DUTYCYCLE           		10000 // 10 [s] value in ms
 
-mac_callback_t mac_callback_g;
+//mac_callback_t mac_callback_g;
 
 volatile bool IsNetworkJoined = false;
 

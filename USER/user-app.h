@@ -121,7 +121,7 @@ extern 		User_t User;
 
 extern 		Sx127x_Handle_t Sx127xHandle;
 
-typedef 		void (*mac_callback_t) (mac_evt_t mac_evt, void *msg);
+//typedef 		void (*mac_callback_t) (mac_evt_t mac_evt, void *msg);
 
 int 			PowerXY(int x, int y);
 
@@ -135,7 +135,7 @@ void 			StringTurnBase(char *str, uint8_t *src, uint8_t len);
 
 void		 	ReadFlashData(void);
 
-void 			UserAppInit(mac_callback_t mac);
+//void 			UserAppInit(mac_callback_t mac);
 
 void 			UserCheckSensors(void);
 
