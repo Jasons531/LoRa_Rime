@@ -48,7 +48,7 @@
 #include <stdio.h>
 /*---------------------------------------------------------------------------*/
 PROCESS(example_abc_process, "ABC example");
-AUTOSTART_PROCESSES(&example_abc_process);
+AUTOSTART_PROCESSES(&etimer_process,&example_abc_process);
 /*---------------------------------------------------------------------------*/
 static void
 abc_recv(struct abc_conn *c)
@@ -71,11 +71,9 @@ PROCESS_THREAD(example_abc_process, ev, data)
   while(1) {
 
     /* Delay 2-4 seconds */
-//    etimer_set(&et, CLOCK_SECOND * 2 + random_rand() % (CLOCK_SECOND * 2));
-    etimer_set(&et, 500);
-	  printf("abc message test\r\n");
+    etimer_set(&et, CLOCK_SECOND * 2 + random_rand() % (CLOCK_SECOND * 2));
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-	   printf("abc message doing\r\n");
+	printf("abc message doing\r\n");
 
     packetbuf_copyfrom("Hello", 6);
     abc_send(&abc);

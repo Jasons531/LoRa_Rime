@@ -106,14 +106,13 @@ uint16_t CheckRecharge(void)
 
 int8_t ReadBattery(void)
 {
-	uint8_t s1, s2, PG;
+	uint8_t s1, s2;
 //	uint16_t RechargeData = 0;
 	
 	int8_t  Battery = CheckBattery(  );
 	
 	s1 = (uint8_t)HAL_GPIO_ReadPin(OUT_CH_CE_GPIO_Port,IN_CH_STAT1_Pin);
 	s2 = (uint8_t)HAL_GPIO_ReadPin(OUT_CH_CE_GPIO_Port,IN_CH_STAT2_Pin);
-	PG = (uint8_t)HAL_GPIO_ReadPin(OUT_CH_CE_GPIO_Port,IN_CH_PG_Pin);	
 
 	switch( (s2<<1) | s1 )
 	{

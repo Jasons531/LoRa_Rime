@@ -227,11 +227,9 @@ void USART4_5_IRQHandler(void)
   /* USER CODE BEGIN USART4_5_IRQn 0 */
 
   /* USER CODE END USART4_5_IRQn 0 */
-//   HAL_UART_IRQHandler(&huart5);
+   HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN USART4_5_IRQn 1 */
-		
-	FIFO_UartIRQ(&usart_rs485);
-	
+			
   /* USER CODE END USART4_5_IRQn 1 */
 }
 

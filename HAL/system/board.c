@@ -26,7 +26,6 @@ Maintainer: Miguel Luis and Gregory Cristian
 Uart_t UartUsb;
 #endif
 
-
 extern void app_mac_cb (mac_evt_t evt, void *msg);
 
 extern RadioEvents_t *RadioEvents;
@@ -69,10 +68,6 @@ void BoardInitMcu( void )
 	LoRaPowerOn(  );	
 	
 	LedInit(  );
- 
-// 	SensorsInit(  );
-//	
-//	BatteryInit(  );
 
 	printf("BoardInitMcu\r\n");       
 }
@@ -87,9 +82,7 @@ void WakeupInitMcu( void )
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		__HAL_RCC_GPIOA_CLK_ENABLE(); ///开启时钟		
 			
-		SystemClockReConfig(  ); //HSE user
-				
-//		SystemClockConfig( );
+		SystemClockReConfig(  ); //HSE user				
 		
 		LedInit(  );
 				 
@@ -99,9 +92,7 @@ void WakeupInitMcu( void )
 		/****************SPI初始化*******************/
 		SPI1_Init( );
 	 
-		SPI1_NSS( );						///片选初始化
-		
-//		SpiFlashCsInit(  ); 
+		SPI1_NSS( );						///片选初始化		
 	 
 		/***************SX1276 I/O初始化********************/
 		SX1276IoInit( );
@@ -110,15 +101,6 @@ void WakeupInitMcu( void )
 		MX_ADC_Init( );
 		
 		uint32_t time = HAL_GetTick();
-			
-		SensorsInit(  );
-		
-		BatteryInit( );
-		
-//	Radio.ResetInit( RadioEvents );
-//	Radio.Init( RadioEvents );
-	// Random seed initialization
-//  srand1( Radio.Random( ) );
 		
 		LedOff();
 	}

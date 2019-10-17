@@ -39,19 +39,9 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart5;
 
-UART_FIFO_Typedef_t usart_rs485;
-
 UART_RX UART_RX_DATA1 = {0, {0}, 0, {0}, false, false};
 UART_RX UART_RX_DATA2 = {0, {0}, 0, {0}, false, false};
 
-uint8_t rx_rs485_buff[100] = {0};
-uint8_t tx_rs485_buff[100] = {0};
-
-void InitUartFifo(void)
-{
-	FIFO_UartVarInit(&usart_rs485,&huart5,tx_rs485_buff,rx_rs485_buff,100,100,NULL,NULL,NULL);
-	FIFO_UartEnableRxIT(&usart_rs485);
-}
 
 /* USART1 init function */
 
@@ -73,7 +63,7 @@ void MX_USART1_UART_Init(void)
   }
 	
 	HAL_NVIC_SetPriority(USART1_IRQn, 8, 0);
-  HAL_NVIC_EnableIRQ(USART1_IRQn);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
 	HAL_UART_Receive_IT(&huart1,UART_RX_DATA1.aRxBuffer, RXBUFFERSIZE);
 }
 
@@ -97,7 +87,7 @@ void MX_USART2_UART_Init(void)
   }
 	
 	HAL_NVIC_SetPriority(USART2_IRQn, 8, 2);
-  HAL_NVIC_EnableIRQ(USART2_IRQn);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
 	HAL_UART_Receive_IT(&huart2,UART_RX_DATA2.aRxBuffer, RXBUFFERSIZE);
 }
 /* USART5 init function */

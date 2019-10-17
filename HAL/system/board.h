@@ -22,8 +22,6 @@ Maintainer: Miguel Luis and Gregory Cristian
 #include <stdint.h>
 #include "stm32l0xx_hal.h"
 #include "stm32l0xx_hal_tim.h"
-#include "utilities.h"
-#include "timerserver.h"
 #include "delay.h"
 #include "gpio.h"
 #include "gpio-board.h"
@@ -38,12 +36,10 @@ Maintainer: Miguel Luis and Gregory Cristian
 #include "stmflash.h"
 #include "power.h"
 #include "debug.h"
-#include "sx1276/sx1276.h"
+#include "sx1276.h"
 #include "rtc-board.h"
 #include "timer-board.h"
 #include "sx1276-board.h"
-#include "LoRaMac-api-v3.h"
-#include "LoRa-cad.h"
 #include "user_spi_flash.h"
 
 /*!

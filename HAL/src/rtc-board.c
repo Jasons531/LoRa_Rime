@@ -35,7 +35,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include <math.h>
 #include <stdbool.h>
-#include "utilities.h"
 #include "board.h"
 #include "rtc-board.h"
 

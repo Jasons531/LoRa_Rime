@@ -54,7 +54,7 @@
 
 extern const struct chameleon_module CHAMELEON_MODULE;
 
-#define DEBUG 0
+#define DEBUG 1
 #if DEBUG
 #include <stdio.h>
 #define PRINTF(...) printf(__VA_ARGS__)
@@ -75,14 +75,14 @@ printbin(int n, int digits)
 {
   int i;
   char output[128];
-
+	printf("bin: ");
   for(i = 0; i < digits; ++i) {
     output[digits - i - 1] = (n & 1) + '0';
     n >>= 1;
+	printf("%02x ",output[digits - i - 1]);
   }
   output[i] = 0;
-
-  printf(output);
+  printf("\r\n");
 }
 
 static void

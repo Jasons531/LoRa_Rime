@@ -42,7 +42,7 @@
  * @{
  */
 
-#define DEBUG 0
+#define DEBUG 1
 #if DEBUG
 #include <stdio.h>
 #define PRINTF(...) printf(__VA_ARGS__)
@@ -177,6 +177,7 @@ int
 rime_output(struct channel *c)
 {
   RIMESTATS_ADD(tx);
+	PRINTF(":%s, line: %d\n",__FILE__,__LINE__);
   if(chameleon_create(c)) {
     packetbuf_compact();
 

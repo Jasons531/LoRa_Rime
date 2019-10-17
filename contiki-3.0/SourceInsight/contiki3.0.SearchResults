@@ -1,7 +1,0 @@
----- nullradio_driver Matches (6 in 6 files) ----
-Contiki-conf.h (core):#define NETSTACK_CONF_RADIO nullradio_driver
-Contiki-conf.h (platform\native):#define NETSTACK_CONF_RADIO   nullradio_driver
-Contiki-default-conf.h (core):#define NETSTACK_CONF_RADIO nullradio_driver
-Netstack.h (core\net):#define NETSTACK_RADIO   nullradio_driver
-Nullradio.c (core\dev):const struct radio_driver nullradio_driver =
-Nullradio.h (core\dev):extern const struct radio_driver nullradio_driver;
