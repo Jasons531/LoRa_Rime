@@ -1,1 +1,12 @@
----- contiki-default-config Matches (0 in 0 files) ----
+---- packetbuf_attrs Matches (11 in 2 files) ----
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):struct packetbuf_attr packetbuf_attrs[PACKETBUF_NUM_ATTRS];
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):    packetbuf_attrs[i].val = 0;
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  memcpy(attrs, packetbuf_attrs, sizeof(packetbuf_attrs));
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  memcpy(packetbuf_attrs, attrs, sizeof(packetbuf_attrs));
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):/*   packetbuf_attrs[type].type = type; */
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  packetbuf_attrs[type].val = val;
+Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  return packetbuf_attrs[type].val;
+Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):extern struct packetbuf_attr packetbuf_attrs[];
+Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):/*   packetbuf_attrs[type].type = type; */
+Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):  packetbuf_attrs[type].val = val;
+Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):  return packetbuf_attrs[type].val;

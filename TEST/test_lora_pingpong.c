@@ -353,10 +353,7 @@ int main(void)
 				
 #endif		
   }
- 
-
 }
-
 
 void OnTxDone( void )
 {
