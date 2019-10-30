@@ -599,7 +599,7 @@ void SX1276SetTxConfig( RadioModems_t modem, int8_t power, uint32_t fdev,
                 power = 20;
             }
             paConfig = ( paConfig & RF_PACONFIG_OUTPUTPOWER_MASK ) | ( uint8_t )( ( uint16_t )( power - 5 ) & 0x0F );
-            DEBUG(3,"power--1 = 0x%02x\r\n", paConfig);  ///17---255
+            DEBUG(3,"power--1 = 0x%02x\r\n", paConfig);  
         }
         else
         {
@@ -612,7 +612,7 @@ void SX1276SetTxConfig( RadioModems_t modem, int8_t power, uint32_t fdev,
                 power = 17;
             }
             paConfig = ( paConfig & RF_PACONFIG_OUTPUTPOWER_MASK ) | ( uint8_t )( ( uint16_t )( power - 2 ) & 0x0F );
-			DEBUG(3,"power---2 = 0x%02x\r\n", paConfig);  ///17---255
+			DEBUG(3,"power---2 = 0x%02x\r\n", paConfig);  
         }
     }
     else
@@ -1349,29 +1349,19 @@ uint8_t SX1276Read( uint8_t addr )
 
 void SX1276WriteBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
 {
-		//NSS = 0;
     GpioWrite( GPIOA,GPIO_PIN_4,GPIO_PIN_RESET );
-
     SPI1_Write( addr | 0x80 );
-
-		HAL_SPI_Transmit(&hspi1, buffer, size, 0xFFFFFFFF);
-
-    //NSS = 1;
+	HAL_SPI_Transmit(&hspi1, buffer, size, 0xFFFFFFFF);
     GpioWrite( GPIOA,GPIO_PIN_4,GPIO_PIN_SET );
 }
 
 extern bool readfifo;
 void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
 {
-		//NSS = 0;
-		GpioWrite( GPIOA,GPIO_PIN_4,GPIO_PIN_RESET );
-
-		SPI1_Write(addr & 0x7F );  ///∑¢ÀÕµÿ÷∑√¸¡Ó
-
-		HAL_SPI_Receive(&hspi1, buffer, size, 0xFFFFFFFF);
-
-		//NSS = 1;
-		GpioWrite( GPIOA,GPIO_PIN_4,GPIO_PIN_SET );
+	GpioWrite( GPIOA,GPIO_PIN_4,GPIO_PIN_RESET );
+	SPI1_Write(addr & 0x7F );  ///∑¢ÀÕµÿ÷∑√¸¡Ó
+	HAL_SPI_Receive(&hspi1, buffer, size, 0xFFFFFFFF);
+	GpioWrite( GPIOA,GPIO_PIN_4,GPIO_PIN_SET );
 }
 
 void SX1276WriteFifo( uint8_t *buffer, uint8_t size )
@@ -1458,7 +1448,7 @@ void SX1276OnDio0Irq( void )
 {
     volatile uint8_t irqFlags = 0;
 	
-	  DEBUG_APP(3,);
+	DEBUG_APP(3,);
     
     switch( SX1276.Settings.State )
     {                

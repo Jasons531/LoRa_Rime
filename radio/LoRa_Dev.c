@@ -1,7 +1,5 @@
 
 #include "LoRa_Dev.h"
-#include "sx1276.h"
-
 #include "contiki.h"
 
 #include "net/packetbuf.h"
@@ -104,8 +102,7 @@ uint8_t LoRa_last_correlation;
 static uint8_t receive_on;
 static int channel;
 
-static radio_result_t
-get_value(radio_param_t param, radio_value_t *value)
+static radio_result_t get_value(radio_param_t param, radio_value_t *value)
 {
   if(!value) {
     return RADIO_RESULT_INVALID_VALUE;
@@ -168,38 +165,78 @@ set_object(radio_param_t param, const void *src, size_t size)
 const struct radio_driver cc2520_driver =
   {
     LoRa_init,
-    LoRa_prepare,
-    LoRa_transmit,
     LoRa_send,
     LoRa_read,
-    /* cc2520_set_channel, */
-    /* detected_energy, */
-    LoRa_cca,
-    LoRa_receiving_packet,
-    pending_packet,
     LoRa_on,
     LoRa_off,
-    get_value,
-    set_value,
     get_object,
     set_object
   };
 
 /*---------------------------------------------------------------------------*/
-static unsigned int
-status(void)
+static RadioState_t status(void)
 {
-  uint8_t status;
-//  LoRa_GET_STATUS(status);
-  return status;
+  return Radio.GetStatus();
 }
 /*---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
-static void
-set_txpower(uint8_t power)
+static void set_txpower(uint8_t power)
 {
+	uint8_t paConfig = 0;
+    uint8_t paDac = 0;
+	
+	paConfig = SX1276Read( REG_PACONFIG );
+    paDac = SX1276Read( REG_PADAC );
 
+    paConfig = ( paConfig & RF_PACONFIG_PASELECT_MASK ) | SX1276GetPaSelect( SX1276.Settings.Channel );
+    paConfig = ( paConfig & RF_PACONFIG_MAX_POWER_MASK ) | 0x70;
+
+    if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
+    {
+        if( power > 17 )
+        {
+            paDac = ( paDac & RF_PADAC_20DBM_MASK ) | RF_PADAC_20DBM_ON;
+        }
+        else
+        {
+            paDac = ( paDac & RF_PADAC_20DBM_MASK ) | RF_PADAC_20DBM_OFF;
+        }
+        if( ( paDac & RF_PADAC_20DBM_ON ) == RF_PADAC_20DBM_ON )
+        {
+            if( power < 5 )
+            {
+                power = 5;
+            }
+            if( power > 20 )
+            {
+                power = 20;
+            }
+            paConfig = ( paConfig & RF_PACONFIG_OUTPUTPOWER_MASK ) | ( uint8_t )( ( uint16_t )( power - 5 ) & 0x0F );
+        }
+        else
+        {
+            if( power < 2 )
+            {
+                power = 2;
+            }
+            if( power > 17 )
+            {
+                power = 17;
+            }
+            paConfig = ( paConfig & RF_PACONFIG_OUTPUTPOWER_MASK ) | ( uint8_t )( ( uint16_t )( power - 2 ) & 0x0F );
+        }
+    }
+    else
+    {
+        if( power > 14 )
+        {
+            power = 14;
+        }
+        paConfig = ( paConfig & RF_PACONFIG_OUTPUTPOWER_MASK ) | ( uint8_t )( ( uint16_t )( power + 1 ) & 0x0F );
+    }
+    
+    SX1276Write( REG_PACONFIG, paConfig );
 }
 /*---------------------------------------------------------------------------*/
 #define AUTOCRC (1 << 6)
@@ -207,8 +244,7 @@ set_txpower(uint8_t power)
 #define FRAME_MAX_VERSION ((1 << 3) | (1 << 2))
 #define FRAME_FILTER_ENABLE (1 << 0)
 /*---------------------------------------------------------------------------*/
-int
-LoRa_init(void)
+int LoRa_init(void)
 {
   Radio.Init( NULL );
 	
@@ -225,157 +261,30 @@ LoRa_init(void)
   return 1;
 }
 /*---------------------------------------------------------------------------*/
-static int
-LoRa_transmit(unsigned short payload_len)
-{
-  int i, txpower;
-
-  txpower = 0;
-  if(packetbuf_attr(PACKETBUF_ATTR_RADIO_TXPOWER) > 0) {
-    /* Remember the current transmission power */
-    txpower = LoRa_get_txpower();
-    /* Set the specified transmission power */
-    set_txpower(packetbuf_attr(PACKETBUF_ATTR_RADIO_TXPOWER) - 1);
-  }
-
-  /* The TX FIFO can only hold one packet. Make sure to not overrun
-   * FIFO by waiting for transmission to start here and synchronizing
-   * with the CC2420_TX_ACTIVE check in cc2420_send.
-   *
-   * Note that we may have to wait up to 320 us (20 symbols) before
-   * transmission starts.
-   */
-#ifndef LORA_CONF_SYMBOL_LOOP_COUNT
-PRINTF("LORA_CONF_SYMBOL_LOOP_COUNT needs to be set!!!\n");
-#else
-#define LOOP_20_SYMBOLS CC2420_CONF_SYMBOL_LOOP_COUNT
-#endif
-
-#if WITH_SEND_CCA
-  BUSYWAIT_UNTIL(status() & BV(CC2520_RSSI_VALID) , RTIMER_SECOND / 10);  strobe(CC2520_INS_STXONCCA);
-#endif /* WITH_SEND_CCA */
-  for(i = LOOP_20_SYMBOLS; i > 0; i--) {
-    if(CC2520_SFD_IS_1) {
-      {
-        rtimer_clock_t sfd_timestamp;
-        sfd_timestamp = cc2520_sfd_start_time;
-#if PACKETBUF_WITH_PACKET_TYPE
-        if(packetbuf_attr(PACKETBUF_ATTR_PACKET_TYPE) ==
-           PACKETBUF_ATTR_PACKET_TYPE_TIMESTAMP) {
-          /* Write timestamp to last two bytes of packet in TXFIFO. */
-          CC2520_WRITE_RAM(&sfd_timestamp, CC2520RAM_TXFIFO + payload_len - 1, 2);
-        }
-#endif
-      }
-
-      if(!(status() & BV(CC2520_TX_ACTIVE))) {
-        /* SFD went high but we are not transmitting. This means that
-           we just started receiving a packet, so we drop the
-           transmission. */
-        RELEASE_LOCK();
-        return RADIO_TX_COLLISION;
-      }
-      if(receive_on) {
-		ENERGEST_OFF(ENERGEST_TYPE_LISTEN);
-      }
-      ENERGEST_ON(ENERGEST_TYPE_TRANSMIT);
-      /* We wait until transmission has ended so that we get an
-	 accurate measurement of the transmission time.*/
-     //BUSYWAIT_UNTIL(getreg(CC2520_EXCFLAG0) & TX_FRM_DONE , RTIMER_SECOND / 100);
-      BUSYWAIT_UNTIL(!(status() & BV(CC2520_TX_ACTIVE)), RTIMER_SECOND / 10);
-
-#ifdef ENERGEST_CONF_LEVELDEVICE_LEVELS
-      ENERGEST_OFF_LEVEL(ENERGEST_TYPE_TRANSMIT,cc2520_get_txpower());
-#endif
-      ENERGEST_OFF(ENERGEST_TYPE_TRANSMIT);
-      if(receive_on) {
-	ENERGEST_ON(ENERGEST_TYPE_LISTEN);
-      } else {
-	/* We need to explicitly turn off the radio,
-	 * since STXON[CCA] -> TX_ACTIVE -> RX_ACTIVE */
-	off();
-      }
-
-      if(packetbuf_attr(PACKETBUF_ATTR_RADIO_TXPOWER) > 0) {
-        /* Restore the transmission power */
-        set_txpower(txpower & 0xff);
-      }
-
-      RELEASE_LOCK();
-
-      return RADIO_TX_OK;
-    }
-  }
-
-  /* If we are using WITH_SEND_CCA, we get here if the packet wasn't
-     transmitted because of other channel activity. */
-  RIMESTATS_ADD(contentiondrop);
-  PRINTF("LoRa: do_send() transmission never started\n");
-
-  if(packetbuf_attr(PACKETBUF_ATTR_RADIO_TXPOWER) > 0) {
-    /* Restore the transmission power */
-    set_txpower(txpower & 0xff);
-  }
-
-  RELEASE_LOCK();
-  return RADIO_TX_COLLISION;
-}
-/*---------------------------------------------------------------------------*/
-static int
-LoRa_send(const void *payload, unsigned short payload_len)
+static int LoRa_send(const void *payload, unsigned short payload_len)
 {
   Radio.Send( (uint8_t *)payload, payload_len );
-  return LoRa_transmit(payload_len);
 }
 /*---------------------------------------------------------------------------*/
-int
-LoRa_off(void)
+int LoRa_off(void)
 {
-  return 1;
+	Radio.Standby();
+	return 1;
 }
 /*---------------------------------------------------------------------------*/
-int
-LoRa_on(void)
+int LoRa_on(void)
 {
- 
+	
 }
 /*---------------------------------------------------------------------------*/
-int
-LoRa_get_channel(void)
+int LoRa_get_channel(void)
 {
   return channel;
 }
 /*---------------------------------------------------------------------------*/
-int
-LoRa_set_channel(int c)
+int LoRa_set_channel(int c)
 {
-  uint16_t f;
-  /*
-   * Subtract the base channel (11), multiply by 5, which is the
-   * channel spacing. 357 is 2405-2048 and 0x4000 is LOCK_THR = 1.
-   */
-  channel = c;
-
-//  f = MIN_CHANNEL + ((channel - MIN_CHANNEL) * CHANNEL_SPACING);
-//  /*
-//   * Writing RAM requires crystal oscillator to be stable.
-//   */
-//  BUSYWAIT_UNTIL((status() & (BV(CC2520_XOSC16M_STABLE))), RTIMER_SECOND / 10);
-
-//  /* Wait for any transmission to end. */
-//  BUSYWAIT_UNTIL(!(status() & BV(CC2520_TX_ACTIVE)), RTIMER_SECOND / 10);
-
-//  /* Define radio channel (between 11 and 25) */
-//  setreg(CC2520_FREQCTRL, f);
-
-//  /* If we are in receive mode, we issue an SRXON command to ensure
-//     that the VCO is calibrated. */
-//  if(receive_on) {
-//    strobe(CC2520_INS_SRXON);
-//  }
-
-  RELEASE_LOCK();
-  return 1;
+  Radio.SetChannel(c);
 }
 /*---------------------------------------------------------------------------*/
 void
@@ -448,8 +357,7 @@ PROCESS_THREAD(LoRa_process, ev, data)
   PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
-static int
-LoRa_read(void *buf, unsigned short bufsize)
+static int LoRa_read(void *buf, unsigned short bufsize)
 {
   uint8_t footer[2];
   uint8_t len;
@@ -489,28 +397,17 @@ LoRa_read(void *buf, unsigned short bufsize)
   return len - FOOTER_LEN;
 }
 /*---------------------------------------------------------------------------*/
-void
-LoRa_set_txpower(uint8_t power)
+void LoRa_set_txpower(uint8_t power)
 {
   set_txpower(power);
 }
 /*---------------------------------------------------------------------------*/
-int
-LoRa_get_txpower(void)
-{
-  uint8_t power;
-//  power = getreg(CC2520_TXPOWER);
-  return power;
+int LoRa_get_txpower(void)
+{  
+  return SX1276Read( REG_PACONFIG );
 }
 /*---------------------------------------------------------------------------*/
-int
-LoRa_rssi(void)
+int LoRa_rssi(void)
 {
-  int rssi;
-  int radio_was_off = 0;
-
-//  BUSYWAIT_UNTIL(status() & BV(CC2520_RSSI_VALID), RTIMER_SECOND / 100);
-
-//  rssi = (int)((signed char)getreg(CC2520_RSSI));
-  return rssi;
+  return Radio.Rssi(MODEM_LORA);
 }

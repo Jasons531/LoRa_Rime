@@ -1,12 +1,32 @@
----- packetbuf_attrs Matches (11 in 2 files) ----
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):struct packetbuf_attr packetbuf_attrs[PACKETBUF_NUM_ATTRS];
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):    packetbuf_attrs[i].val = 0;
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  memcpy(attrs, packetbuf_attrs, sizeof(packetbuf_attrs));
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  memcpy(packetbuf_attrs, attrs, sizeof(packetbuf_attrs));
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):/*   packetbuf_attrs[type].type = type; */
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  packetbuf_attrs[type].val = val;
-Packetbuf.c (e:\nbi_project\lora\contiki-3.0\core\net):  return packetbuf_attrs[type].val;
-Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):extern struct packetbuf_attr packetbuf_attrs[];
-Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):/*   packetbuf_attrs[type].type = type; */
-Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):  packetbuf_attrs[type].val = val;
-Packetbuf.h (e:\nbi_project\lora\contiki-3.0\core\net):  return packetbuf_attrs[type].val;
+---- tx_buf Matches (31 in 11 files) ----
+Adf7023-contiki.c (e:\nbi_project\lora\contiki-3.0\cpu\rl78\adf7023):static unsigned char tx_buf[ADF7023_MAX_PACKET_SIZE];
+Adf7023-contiki.c (e:\nbi_project\lora\contiki-3.0\cpu\rl78\adf7023):  memcpy(tx_buf, payload, (payload_len <= sizeof(tx_buf)) ? payload_len : sizeof(tx_buf));
+Adf7023-contiki.c (e:\nbi_project\lora\contiki-3.0\cpu\rl78\adf7023):  ADF7023_TransmitPacket(tx_buf, transmit_len);
+Adxl345.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  uint8_t tx_buf[] = {reg, val};
+Adxl345.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  i2c_transmit_n(2, tx_buf);
+Cc26xx-rf.c (e:\nbi_project\lora\contiki-3.0\cpu\cc26xx\dev):static uint8_t tx_buf[TX_BUF_SIZE];
+Cc26xx-rf.c (e:\nbi_project\lora\contiki-3.0\cpu\cc26xx\dev):  int len = MIN(payload_len, sizeof(tx_buf));
+Cc26xx-rf.c (e:\nbi_project\lora\contiki-3.0\cpu\cc26xx\dev):  memcpy(tx_buf, payload, len);
+Cc26xx-rf.c (e:\nbi_project\lora\contiki-3.0\cpu\cc26xx\dev):  GET_FIELD(cmd_immediate_buf, CMD_IEEE_TX, pPayload) = tx_buf;
+I2c.c (e:\nbi_project\lora\contiki-3.0\cpu\mc1322x\lib):void i2c_transmitinit(uint8_t slave_address, uint8_t byte_ctr, uint8_t *tx_buf) {
+I2c.c (e:\nbi_project\lora\contiki-3.0\cpu\mc1322x\lib):	tx_buf_ptr  = tx_buf;
+I2c.h (e:\nbi_project\lora\contiki-3.0\cpu\mc1322x\lib\include): * @parameter tx_buf		the buffer in which the bytes to be sent are stored
+I2c.h (e:\nbi_project\lora\contiki-3.0\cpu\mc1322x\lib\include):void i2c_transmitinit(uint8_t slave_address, uint8_t byte_ctr, uint8_t *tx_buf);
+I2cmaster.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):i2c_transmit_n(uint8_t byte_ctr, uint8_t *tx_buf)
+I2cmaster.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  tx_buf_ptr = tx_buf;
+I2cmaster.h (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):void i2c_transmit_n(uint8_t byte_ctr, uint8_t *tx_buf);
+Light-ziglet.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  uint8_t tx_buf[] = { reg, 0x00, 0x00 };
+Light-ziglet.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  tx_buf[1] = (uint8_t)(val >> 8);
+Light-ziglet.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  tx_buf[2] = (uint8_t)(val & 0x00FF);
+Light-ziglet.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  i2c_transmit_n(3, tx_buf);
+Radio.c (e:\nbi_project\lora\contiki-3.0\cpu\arm\aducrf101\dev):static uint8_t tx_buf[MAX_PACKET_LEN];
+Radio.c (e:\nbi_project\lora\contiki-3.0\cpu\arm\aducrf101\dev):  memcpy(tx_buf, payload, payload_len);
+Radio.c (e:\nbi_project\lora\contiki-3.0\cpu\arm\aducrf101\dev):  if(RadioTxPacketVariableLen(transmit_len, tx_buf) != RIE_Success) {
+Tlc59116.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  uint8_t tx_buf[] = { reg, val };
+Tlc59116.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  i2c_transmit_n(2, tx_buf);
+Tlc59116.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  uint8_t tx_buf[] =
+Tlc59116.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  tlc59116_write_stream(17, tx_buf);
+Tmp102.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  uint8_t tx_buf[] = { reg, 0x00, 0x00 };
+Tmp102.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  tx_buf[1] = (uint8_t)(val >> 8);
+Tmp102.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  tx_buf[2] = (uint8_t)(val & 0x00FF);
+Tmp102.c (e:\nbi_project\lora\contiki-3.0\platform\z1\dev):  i2c_transmit_n(3, tx_buf);

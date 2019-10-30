@@ -17,6 +17,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "sx1276.h"
+#include "sx1276-board.h"
+
 /**
  * Each radio has a set of parameters that designate the current
  * configuration and state of the radio. Parameters can either have
@@ -234,5 +237,19 @@ struct radio_driver {
 
 };
 
+static RadioState_t status(void);
+static void set_txpower(uint8_t power);
+int LoRa_init(void);
+static int LoRa_transmit(unsigned short payload_len);
+static int LoRa_send(const void *payload, unsigned short payload_len);
+int LoRa_off(void);
+int LoRa_on(void);
+
+int LoRa_get_channel(void);
+int LoRa_set_channel(int c);
+static int LoRa_read(void *buf, unsigned short bufsize);
+void LoRa_set_txpower(uint8_t power);
+int LoRa_get_txpower(void);
+int LoRa_rssi(void);
 
 #endif /* __LoRa-cad_H */
